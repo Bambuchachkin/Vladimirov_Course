@@ -1,0 +1,12 @@
+FLAGS ?= 
+ifeq ($(origin CC), default)
+	CC = g++
+endif
+
+all: cache
+
+cache: main.cpp LFU_Cache.cpp Perfect_Cache.cpp
+	$(CC) $(FLAGS) $^ -o $@
+
+clean:
+	rm -f cache
