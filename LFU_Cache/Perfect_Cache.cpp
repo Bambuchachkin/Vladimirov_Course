@@ -1,6 +1,4 @@
 #include "Perfect_Cache.h"
-
-#include "LFU_Cache.h"
 #include <iostream>
 
 

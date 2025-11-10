@@ -27,27 +27,27 @@ int main() {
 
         if (per_cache.get_item(new_item) == -1) {
             per_cache.push_item(new_item);
-            std::cout<<i<<") ";
-            std::cout<<"PER| miss to "<<new_item<<"|";
+            // std::cout<<i<<") ";
+            // std::cout<<"PER| miss to "<<new_item<<"|";
         } else {
-            std::cout<<i<<") ";
-            std::cout<<"PER| HIT to "<<new_item<<"|";
+            // std::cout<<i<<") ";
+            // std::cout<<"PER| HIT to "<<new_item<<"|";
             per_hits_number++;
         }
-        per_cache.print_buffer();
+        // per_cache.print_buffer();
 
         if (lfu_cache.get_item(new_item) == -1) {
             lfu_cache.push_item(new_item);
-            std::cout<<i<<") ";
-            std::cout<<"miss to "<<new_item<<"|";
+            // std::cout<<i<<") ";
+            // std::cout<<"miss to "<<new_item<<"|";
         } else {
-            std::cout<<i<<") ";
-            std::cout<<"HIT to "<<new_item<<"|";
+            // std::cout<<i<<") ";
+            // std::cout<<"HIT to "<<new_item<<"|";
             hits_number++;
         }
-        lfu_cache.print_buffer();
+        // lfu_cache.print_buffer();
     }
 
-    std::cout<<"hits_number = "<<hits_number<<'\n';
+    std::cout<<"lfu_hits_number = "<<hits_number<<'\n';
     std::cout<<"per_hits_number = "<<per_hits_number<<'\n';
 }

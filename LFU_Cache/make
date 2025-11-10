@@ -1,4 +1,4 @@
-FLAGS ?= 
+FLAGS ?= -O2
 ifeq ($(origin CC), default)
 	CC = g++
 endif
@@ -8,5 +8,11 @@ all: cache
 cache: main.cpp LFU_Cache.cpp Perfect_Cache.cpp
 	$(CC) $(FLAGS) $^ -o $@
 
+valgrind: ./cache
+	valgrind --leak-check=full --track-origins=yes ./cache
+
+test: TEST.cpp LFU_Cache.cpp Perfect_Cache.cpp
+	$(CC) $(FLAGS) $^ -o $@
+
 clean:
-	rm -f cache
+	rm -f cache test

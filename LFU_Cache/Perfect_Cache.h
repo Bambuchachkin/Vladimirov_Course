@@ -2,7 +2,6 @@
 #define PERFECT_CACHE_H
 
 #include <unordered_map>
-#include <list>
 #include <vector>
 
 class Perfect_Cache {
