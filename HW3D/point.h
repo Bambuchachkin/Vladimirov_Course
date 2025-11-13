@@ -4,17 +4,22 @@
 
 #ifndef POINT_H
 #define POINT_H
-
+#include <vector>
 
 
 class point {
-    int p_x, p_y, p_z;
+    double p_x, p_y, p_z;
 public:
-    point(int x, int y, int z);
+    point(double x, double y, double z);
 
-    int get_x() const;
-    int get_y() const;
-    int get_z() const;
+    std::vector<double> get_pos();
+    double get_x() const;
+    double get_y() const;
+    double get_z() const;
+
+    void set_x(double new_x);
+    void set_y(double new_x);
+    void set_z(double new_x);
 };
 
 

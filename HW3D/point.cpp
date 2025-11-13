@@ -4,16 +4,33 @@
 
 #include "point.h"
 
-point::point(int x, int y, int z) : p_x(x), p_y(y), p_z(z) {}
+point::point(double x, double y, double z) : p_x(x), p_y(y), p_z(z) {}
 
-int point::get_x() const {
+std::vector<double> point::get_pos() {
+    return {p_x, p_y, p_z};
+}
+
+
+double point::get_x() const {
     return p_x;
 }
 
-int point::get_y() const {
+double point::get_y() const {
     return p_y;
 }
 
-int point::get_z() const {
+double point::get_z() const {
     return p_z;
+}
+
+void point::set_x(double new_x) {
+    p_x = new_x;
+}
+
+void point::set_y(double new_y) {
+    p_x = new_y;
+}
+
+void point::set_z(double new_z) {
+    p_x = new_z;
 }
