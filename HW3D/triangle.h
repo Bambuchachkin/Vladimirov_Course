@@ -21,6 +21,9 @@ class triangle {
     std::vector<int> possible_neighbors_numbers;
 public:
     triangle(point &point_1, point &point_2, point &point_3);
+
+    std::vector<int> get_box();
+    void add_possible_neighbor_number(int number);
 };
 
 

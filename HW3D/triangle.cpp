@@ -20,3 +20,13 @@ triangle::triangle(point &point_1, point &point_2, point &point_3) {
     t_box.y_size = std::max(point_1.get_y(), point_2.get_y(), point_3.get_y()) - t_box.root_y;
     t_box.z_size = std::max(point_1.get_z(), point_2.get_z(), point_3.get_z()) - t_box.root_z;
 }
+
+std::vector<int> triangle::get_box() {
+    return {t_box.root_x, t_box.root_y, t_box.root_z,
+    t_box.x_size, t_box.y_size, t_box.z_size};
+}
+
+void triangle::add_possible_neighbor_number(int number) {
+    possible_neighbors_numbers.push_back(number);
+}
+

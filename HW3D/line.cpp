@@ -12,6 +12,14 @@ line::line(point &point_1, point &point_2) {
     n = point_2.get_z() - point_1.get_z();
 }
 
+std::vector<int> line::get_pos_1() {
+    return {p1.get_x(), p1.get_y(), p1.get_z()};
+}
+
+std::vector<int> line::get_l_m_n() {
+    return {l, m, n};
+}
+
 int line::get_x1() const {
     return p1.get_x();
 }
