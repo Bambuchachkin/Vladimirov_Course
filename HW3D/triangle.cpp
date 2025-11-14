@@ -27,7 +27,15 @@ triangle::triangle(point &point_1, point &point_2, point &point_3) {
     t_box.x_size = std::max(point_1.get_x(), point_2.get_x(), point_3.get_x()) - t_box.root_x;
     t_box.y_size = std::max(point_1.get_y(), point_2.get_y(), point_3.get_y()) - t_box.root_y;
     t_box.z_size = std::max(point_1.get_z(), point_2.get_z(), point_3.get_z()) - t_box.root_z;
+    vectors = {p_1[0]-p_2[0], p_1[1]-p_2[1], p_1[2]-p_2[2],
+                p_2[0]-p_3[0], p_2[1]-p_3[1], p_2[2]-p_3[2],
+                p_3[0]-p_1[0], p_3[1]-p_1[1], p_3[2]-p_1[2]};
 }
+
+std::vector<double> triangle::get_vectors() const {
+    return vectors;
+}
+
 
 std::vector<double> triangle::get_plane() const{
     return plane;

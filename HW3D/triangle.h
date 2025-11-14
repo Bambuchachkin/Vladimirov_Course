@@ -19,10 +19,12 @@ class triangle {
     };
     box t_box;
     std::vector<double> plane; // Ax + By + Cz + D = 0
+    std::vector<double> vectors; //p1-p2, p2-p3, p3-p1
     std::vector<int> possible_neighbors_numbers;
 public:
     triangle(point &point_1, point &point_2, point &point_3);
 
+    std::vector<double> get_vectors() const;
     std::vector<double> get_plane() const;
     std::vector<double> get_box() const;
     std::vector<int> get_p_neighbors() const;
