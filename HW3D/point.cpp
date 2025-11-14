@@ -6,7 +6,7 @@
 
 point::point(double x, double y, double z) : p_x(x), p_y(y), p_z(z) {}
 
-std::vector<double> point::get_pos() {
+std::vector<double> point::get_pos() const {
     return {p_x, p_y, p_z};
 }
 

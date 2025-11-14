@@ -49,52 +49,70 @@ std::vector<double> vector_product(const std::vector<double>& v1, const std::vec
     };
 }
 
-double handler::modul_of_vector(const std::vector<double>& v) const {
-    return std::sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-}
-
 // Функция проецирует треугольник на заданную ось и возвращает интервал проекции
-// Вход: треугольник и ось проекции (единичный вектор)
+// Вход: треугольник и ось проекции
 // Выход: вектор {min_projection, max_projection}
-std::vector<double> handler::projectTriangleOnAxis(const triangle& tri, const std::vector<double>& axis) const {
-    // Получаем bounding box треугольника
-    std::vector<double> box = tri.get_box();
+std::vector<double> handler::project_triangle_on_line(const triangle& tr, const std::vector<double>& line) const {
+    std::vector<std::vector<double>> vertices = tr.get_points();
+    double norm = std::sqrt(scalar_product(line, line));
+    double min_proj = scalar_product(vertices[0], line) / norm;
+    double max_proj = min_proj;
+    double proj = 0;
 
-    // Создаем 8 вершин bounding box'а
-    std::vector<std::vector<double>> vertices = {
-        {box[0], box[1], box[2]},                      // min corner
-        {box[0] + box[3], box[1], box[2]},            // min_x + size_x
-        {box[0], box[1] + box[4], box[2]},            // min_y + size_y
-        {box[0], box[1], box[2] + box[5]},            // min_z + size_z
-        {box[0] + box[3], box[1] + box[4], box[2]},   // min_x + size_x, min_y + size_y
-        {box[0] + box[3], box[1], box[2] + box[5]},   // min_x + size_x, min_z + size_z
-        {box[0], box[1] + box[4], box[2] + box[5]},   // min_y + size_y, min_z + size_z
-        {box[0] + box[3], box[1] + box[4], box[2] + box[5]} // max corner
-    };
-
-    // Инициализируем min и max значения
-    double min_proj = std::numeric_limits<double>::max();
-    double max_proj = std::numeric_limits<double>::lowest();
-
-    // Проецируем каждую вершину на ось и находим min/max
-    for (const auto& vertex : vertices) {
-        double projection = dotProduct(vertex, axis);
-        if (projection < min_proj) min_proj = projection;
-        if (projection > max_proj) max_proj = projection;
+    for (int i = 1; i<3; i++) {
+        proj = scalar_product(vertices[i], line) / norm;
+        if (proj>max_proj) {
+            max_proj = proj;
+        } else if (proj<min_proj) {
+            min_proj = proj;
+        }
     }
-
     return {min_proj, max_proj};
 }
 
-bool check_triangles_intersection(triangle& tr_1, triangle& tr_2) {
-    return false;
+bool check_intervals_intersection(const std::vector<double>& int_1, const std::vector<double>& int_2) const {
+    double min1 = int_1[0], max1 = int_1[1];
+    double min2 = int_2[0], max2 = int_2[1];
+    return !(max1 < min2 || max2 < min1);
 }
+
+// Функция генерирует все потенциальные разделяющие оси для SAT теста
+// Для двух треугольников нужно проверить 11 осей:
+// - 2 нормали треугольников
+// - 9 осей из векторных произведений ребер
+// Вход: два треугольника
+// Выход: вектор из 11 осей (единичных векторов)
+std::vector<std::vector<double>> get_separating_lines(const triangle& tr_1, const triangle& tr_2) const {
+    std::vector<std::vector<double>> v_tr_1 = tr_1.get_vectors();
+    std::vector<std::vector<double>> v_tr_2 = tr_2.get_vectors();
+    std::vector<std::vector<double>> lines = {tr_1.get_normal(), tr_2.get_normal()};
+    for (int i =0; i<3; i++) {
+        for (int j =0; j<3; j++) {
+            lines.push_back(vector_product(v_tr_1[i], v_tr_2[j]));
+        }
+    }
+    return lines;
+}
+
+// Основная функция проверки пересечения треугольников методом SAT
+bool handler::check_triangles_intersection(const triangle& tr_1, const triangle& tr_2) const {
+    std::vector<std::vector<double>> lines = get_separating_lines(tr_1, tr_2);
+    for (int i = 0; i<lines.size(); i++) {
+        if (!check_intervals_intersection(project_triangle_on_line(tr_1, lines[i]),
+            project_triangle_on_line(tr_2, lines[i]))) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void handler::find_intersections() {
+    filter();
     std::vector<int> p_neighbors;
     for (int i = 0; i<triangle_map_size; i++) { // для каждого треугольника рассмотрим подозрительных соседей
         p_neighbors = triangle_map[i].get_p_neighbors();
         for (int j = 0; j<p_neighbors.size(); j++) {
-            if (check_box_intersection(triangle_map[i], triangle_map[j])) {
+            if (check_triangles_intersection(triangle_map[i], triangle_map[j])) {
                 number_of_triangles_intersections ++;
                 numbers_of_intersecting_triangles[i] = 1;
                 numbers_of_intersecting_triangles[j] = 1;

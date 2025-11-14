@@ -12,7 +12,7 @@ class point {
 public:
     point(double x, double y, double z);
 
-    std::vector<double> get_pos();
+    std::vector<double> get_pos() const;
     double get_x() const;
     double get_y() const;
     double get_z() const;
