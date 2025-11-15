@@ -8,12 +8,19 @@
 
 handler::handler() {}
 
-void handler::add_triangle(triangle &new_triangle) {
+handler::~handler() {
+    for (auto it = triangle_map.begin(); it!=triangle_map.end(); it++) {
+        delete it->second;
+    }
+}
+
+
+void handler::add_triangle(triangle *new_triangle) {
     triangle_map[triangle_map_size] = new_triangle;
     triangle_map_size++;
 }
 
-bool check_box_intersection(triangle& t_1, triangle& t_2) {
+bool check_box_intersection(const triangle& t_1, const triangle& t_2) {
     std::vector<double> box_1 = t_1.get_box();
     std::vector<double> box_2 = t_2.get_box();
     if ((box_1[0]-box_2[3] <= box_2[0]) && (box_2[0] <= box_1[0]+box_1[3])) {
@@ -29,19 +36,19 @@ bool check_box_intersection(triangle& t_1, triangle& t_2) {
 void handler::filter() {
     for (int i = 0; i<triangle_map_size-1; i++) {
         for (int j = i+1; j<triangle_map_size; j++) {
-            if (check_box_intersection(triangle_map[i], triangle_map[j])) {
-                triangle_map[i].add_possible_neighbor_number(j);
+            if (check_box_intersection(*triangle_map[i], *triangle_map[j])) {
+                triangle_map[i]->add_possible_neighbor_number(j);
                 // triangle_map[j].add_possible_neighbor_number(i); //не нужно тк проверка идет по порядку и номер i проверяется раньше
             }
         }
     }
 }
 
-double scalar_product(const std::vector<double>& v1, const std::vector<double>& v2) const {
+double scalar_product(const std::vector<double>& v1, const std::vector<double>& v2) {
     return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
 
-std::vector<double> vector_product(const std::vector<double>& v1, const std::vector<double>& v2) const {
+std::vector<double> vector_product(const std::vector<double>& v1, const std::vector<double>& v2) {
     return {
         v1[1] * v2[2] - v1[2] * v2[1],
         v1[2] * v2[0] - v1[0] * v2[2],
@@ -52,7 +59,7 @@ std::vector<double> vector_product(const std::vector<double>& v1, const std::vec
 // Функция проецирует треугольник на заданную ось и возвращает интервал проекции
 // Вход: треугольник и ось проекции
 // Выход: вектор {min_projection, max_projection}
-std::vector<double> handler::project_triangle_on_line(const triangle& tr, const std::vector<double>& line) const {
+std::vector<double> project_triangle_on_line(const triangle& tr, const std::vector<double>& line) {
     std::vector<std::vector<double>> vertices = tr.get_points();
     double norm = std::sqrt(scalar_product(line, line));
     double min_proj = scalar_product(vertices[0], line) / norm;
@@ -70,7 +77,7 @@ std::vector<double> handler::project_triangle_on_line(const triangle& tr, const 
     return {min_proj, max_proj};
 }
 
-bool check_intervals_intersection(const std::vector<double>& int_1, const std::vector<double>& int_2) const {
+bool check_intervals_intersection(const std::vector<double>& int_1, const std::vector<double>& int_2) {
     double min1 = int_1[0], max1 = int_1[1];
     double min2 = int_2[0], max2 = int_2[1];
     return !(max1 < min2 || max2 < min1);
@@ -82,7 +89,7 @@ bool check_intervals_intersection(const std::vector<double>& int_1, const std::v
 // - 9 осей из векторных произведений ребер
 // Вход: два треугольника
 // Выход: вектор из 11 осей (единичных векторов)
-std::vector<std::vector<double>> get_separating_lines(const triangle& tr_1, const triangle& tr_2) const {
+std::vector<std::vector<double>> get_separating_lines(const triangle& tr_1, const triangle& tr_2) {
     std::vector<std::vector<double>> v_tr_1 = tr_1.get_vectors();
     std::vector<std::vector<double>> v_tr_2 = tr_2.get_vectors();
     std::vector<std::vector<double>> lines = {tr_1.get_normal(), tr_2.get_normal()};
@@ -95,7 +102,7 @@ std::vector<std::vector<double>> get_separating_lines(const triangle& tr_1, cons
 }
 
 // Основная функция проверки пересечения треугольников методом SAT
-bool handler::check_triangles_intersection(const triangle& tr_1, const triangle& tr_2) const {
+bool check_triangles_intersection(const triangle& tr_1, const triangle& tr_2) {
     std::vector<std::vector<double>> lines = get_separating_lines(tr_1, tr_2);
     for (int i = 0; i<lines.size(); i++) {
         if (!check_intervals_intersection(project_triangle_on_line(tr_1, lines[i]),
@@ -110,12 +117,12 @@ void handler::find_intersections() {
     filter();
     std::vector<int> p_neighbors;
     for (int i = 0; i<triangle_map_size; i++) { // для каждого треугольника рассмотрим подозрительных соседей
-        p_neighbors = triangle_map[i].get_p_neighbors();
+        p_neighbors = triangle_map[i]->get_p_neighbors();
         for (int j = 0; j<p_neighbors.size(); j++) {
-            if (check_triangles_intersection(triangle_map[i], triangle_map[j])) {
+            if (check_triangles_intersection(*triangle_map[i], *triangle_map[p_neighbors[j]])) {
                 number_of_triangles_intersections ++;
                 numbers_of_intersecting_triangles[i] = 1;
-                numbers_of_intersecting_triangles[j] = 1;
+                numbers_of_intersecting_triangles[p_neighbors[j]] = 1;
             }
         }
     }

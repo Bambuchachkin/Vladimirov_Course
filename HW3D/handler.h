@@ -12,11 +12,12 @@ class handler {
     int triangle_map_size = 0;
     int number_of_triangles_intersections = 0;
     std::unordered_map<int, int> numbers_of_intersecting_triangles;
-    std::unordered_map<int, triangle&> triangle_map;
+    std::unordered_map<int, triangle*> triangle_map;
 public:
     handler();
+    ~handler();
 
-    void add_triangle(triangle& new_triangle);
+    void add_triangle(triangle* new_triangle);
     void filter();
     void find_intersections();
 };
