@@ -20,18 +20,32 @@ void handler::add_triangle(triangle *new_triangle) {
     triangle_map_size++;
 }
 
-bool check_box_intersection(const triangle& t_1, const triangle& t_2) {
+bool handler::check_box_intersection(const triangle& t_1, const triangle& t_2) {
     std::vector<double> box_1 = t_1.get_box();
     std::vector<double> box_2 = t_2.get_box();
     if ((box_1[0]-box_2[3] <= box_2[0]) && (box_2[0] <= box_1[0]+box_1[3])) {
         if ((box_1[1]-box_2[4] <= box_2[1]) && (box_2[1] <= box_1[1]+box_1[4])) {
             if ((box_1[2]-box_2[5] <= box_2[2]) && (box_2[2] <= box_1[2]+box_1[5])) {
+                potencial_intersections++;
+                // std::cout<<"POTENCIAL INTERSECTIONS = "<<potencial_intersections<<'\n';
                 return true;
             }
         }
     }
     return false;
 }
+
+// bool handler::check_box_intersection(const triangle& t_1, const triangle& t_2) {
+//     std::vector<double> box_1 = t_1.get_box();
+//     std::vector<double> box_2 = t_2.get_box();
+//     bool x_intersect = (box_1[0] <= box_2[0] + box_2[3]) && (box_2[0] <= box_1[0] + box_1[3]);
+//     bool y_intersect = (box_1[1] <= box_2[1] + box_2[4]) && (box_2[1] <= box_1[1] + box_1[4]);
+//     bool z_intersect = (box_1[2] <= box_2[2] + box_2[5]) && (box_2[2] <= box_1[2] + box_1[5]);
+//     if (x_intersect && y_intersect && z_intersect) {
+//         potencial_intersections++;
+//     }
+//     return x_intersect && y_intersect && z_intersect;
+// }
 
 void handler::filter() {
     for (int i = 0; i<triangle_map_size-1; i++) {
@@ -115,9 +129,11 @@ bool check_triangles_intersection(const triangle& tr_1, const triangle& tr_2) {
 
 void handler::find_intersections() {
     filter();
+    std::cout<<"POTENCIAL INTERSECTIONS = "<<potencial_intersections<<'\n';
     std::vector<int> p_neighbors;
     for (int i = 0; i<triangle_map_size; i++) { // для каждого треугольника рассмотрим подозрительных соседей
         p_neighbors = triangle_map[i]->get_p_neighbors();
+        // std::cout<<"Check num "<<i<<'\n';
         for (int j = 0; j<p_neighbors.size(); j++) {
             if (check_triangles_intersection(*triangle_map[i], *triangle_map[p_neighbors[j]])) {
                 number_of_triangles_intersections ++;
@@ -127,3 +143,13 @@ void handler::find_intersections() {
         }
     }
 }
+
+void handler::print_statistic() const {
+    std::cout<<"number of intersections = "<<number_of_triangles_intersections<<'\n';
+    std::cout<<"number of intersecting triangles = "<<numbers_of_intersecting_triangles.size()<<'\n';
+}
+
+int handler::get_number_of_triangles() const {
+    return triangle_map_size;
+}
+
